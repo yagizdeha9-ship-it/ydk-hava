@@ -4,351 +4,305 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>YDK HAVA | Hava Durumu</title>
-
-<meta name="description" content="YDK HAVA - Anlık hava durumu, 5 günlük tahmin, saatlik hava ve yağış radarı.">
+<title>YDK HAVA</title>
+<meta name="description" content="YDK HAVA - Gerçek hava durumu, radar ve 5 günlük tahmin">
 
 <link rel="stylesheet"
 href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
 <style>
-
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-}
+*{box-sizing:border-box;margin:0;padding:0}
 
 body{
-    font-family:Arial,Helvetica,sans-serif;
-    background:linear-gradient(135deg,#07152e,#102d55,#164d73);
-    color:white;
-    min-height:100vh;
+font-family:Arial,sans-serif;
+background:#061426;
+color:#fff;
+min-height:100vh
 }
 
 header{
-    background:rgba(0,0,0,.35);
-    padding:25px 15px;
-    text-align:center;
-    backdrop-filter:blur(10px);
-    border-bottom:1px solid rgba(255,255,255,.15);
+background:linear-gradient(135deg,#082b50,#0879a8);
+padding:24px 15px;
+text-align:center;
+position:sticky;
+top:0;
+z-index:1000;
+box-shadow:0 4px 20px #0008
 }
 
-header h1{
-    font-size:38px;
-    margin-bottom:8px;
-}
-
-header p{
-    color:#cfe8ff;
-    font-size:15px;
-}
+header h1{font-size:34px}
+header p{margin-top:6px;color:#ccefff}
 
 .container{
-    width:94%;
-    max-width:1200px;
-    margin:25px auto;
+width:94%;
+max-width:1200px;
+margin:20px auto
 }
 
-.search-area{
-    display:flex;
-    gap:10px;
-    margin-bottom:20px;
+.search{
+display:flex;
+gap:8px;
+margin-bottom:18px
 }
 
-.search-area input{
-    flex:1;
-    padding:15px;
-    border:none;
-    border-radius:12px;
-    font-size:16px;
-    outline:none;
+.search input{
+flex:1;
+padding:14px;
+border-radius:12px;
+border:0;
+font-size:16px
 }
 
 button{
-    border:none;
-    padding:14px 18px;
-    border-radius:12px;
-    cursor:pointer;
-    font-weight:bold;
-    background:#28a9ff;
-    color:white;
+padding:13px 17px;
+border:0;
+border-radius:11px;
+background:#079bd3;
+color:white;
+font-weight:bold;
+cursor:pointer
 }
 
-button:hover{
-    opacity:.85;
-}
-
-.location-btn{
-    background:#19c37d;
-}
+button:hover{filter:brightness(1.15)}
 
 .card{
-    background:rgba(255,255,255,.10);
-    border:1px solid rgba(255,255,255,.15);
-    border-radius:20px;
-    padding:22px;
-    margin-bottom:20px;
-    box-shadow:0 10px 30px rgba(0,0,0,.20);
-    backdrop-filter:blur(12px);
+background:#0c233a;
+border:1px solid #ffffff18;
+border-radius:18px;
+padding:20px;
+margin-bottom:18px;
+box-shadow:0 8px 25px #0005
 }
 
-.current{
-    text-align:center;
+.title{
+font-size:23px;
+font-weight:bold;
+margin-bottom:15px
 }
 
-.city{
-    font-size:28px;
-    font-weight:bold;
-}
+/* CURRENT */
 
-.date{
-    color:#c8dded;
-    margin:7px 0 15px;
-}
+.current{text-align:center}
 
-.weather-icon{
-    font-size:75px;
-}
+.city{font-size:29px}
+.date{color:#a9c8dc;margin:6px}
 
-.temperature{
-    font-size:65px;
-    font-weight:bold;
-}
-
-.description{
-    font-size:20px;
-    margin-bottom:18px;
-}
+.big-icon{font-size:70px;margin:12px}
+.temp{font-size:62px;font-weight:bold}
+.desc{font-size:20px;margin:5px 0 20px}
 
 .details{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:12px;
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:10px
 }
 
 .detail{
-    background:rgba(0,0,0,.20);
-    padding:15px;
-    border-radius:15px;
+background:#06192a;
+padding:15px;
+border-radius:12px
 }
 
-.detail strong{
-    display:block;
-    font-size:20px;
-    margin-top:5px;
+.detail span{
+display:block;
+color:#9db9cb;
+font-size:13px;
+margin-bottom:6px
 }
 
-.section-title{
-    font-size:25px;
-    margin-bottom:15px;
-}
+.detail b{font-size:19px}
 
-.forecast{
-    display:grid;
-    grid-template-columns:repeat(5,1fr);
-    gap:12px;
-}
-
-.forecast-day{
-    background:rgba(0,0,0,.20);
-    border-radius:15px;
-    padding:17px 10px;
-    text-align:center;
-}
-
-.forecast-day .icon{
-    font-size:40px;
-    margin:10px 0;
-}
-
-.forecast-day .max{
-    font-size:21px;
-    font-weight:bold;
-}
-
-.forecast-day .min{
-    color:#b9d4e9;
-    margin-top:5px;
-}
+/* HOURLY */
 
 .hourly{
-    display:flex;
-    gap:10px;
-    overflow-x:auto;
-    padding-bottom:8px;
+display:flex;
+gap:9px;
+overflow-x:auto;
+padding-bottom:8px
 }
 
 .hour{
-    min-width:105px;
-    background:rgba(0,0,0,.20);
-    padding:15px 10px;
-    border-radius:15px;
-    text-align:center;
+min-width:95px;
+background:#06192a;
+padding:13px 8px;
+border-radius:12px;
+text-align:center
 }
 
-.hour .hicon{
-    font-size:30px;
-    margin:8px 0;
+.hour-icon{font-size:29px;margin:8px}
+
+/* DAYS */
+
+.days{
+display:grid;
+grid-template-columns:repeat(5,1fr);
+gap:10px
+}
+
+.day{
+background:#06192a;
+padding:15px 8px;
+border-radius:13px;
+text-align:center
+}
+
+.day-icon{font-size:37px;margin:9px}
+.max{font-size:20px;font-weight:bold}
+.min{color:#91aec0;margin-top:4px}
+
+/* RADAR */
+
+.radar-box{
+background:#020c17;
+border-radius:15px;
+overflow:hidden
 }
 
 #map{
-    height:430px;
-    border-radius:18px;
-    overflow:hidden;
+height:480px;
+width:100%
 }
 
-.radar-info{
-    color:#cde6f7;
-    font-size:13px;
-    margin-top:10px;
+.radar-controls{
+display:flex;
+gap:8px;
+flex-wrap:wrap;
+padding:12px;
+background:#06192a;
+align-items:center
 }
 
-.stats{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:12px;
+.radar-time{
+margin-left:auto;
+color:#c5e9ff;
+font-size:14px
 }
 
-.stat{
-    background:rgba(0,0,0,.20);
-    padding:18px;
-    border-radius:15px;
-    text-align:center;
+.legend{
+display:flex;
+gap:14px;
+flex-wrap:wrap;
+margin-top:12px;
+font-size:13px;
+color:#c3d9e7
 }
 
-.stat-number{
-    font-size:27px;
-    font-weight:bold;
+.dot{
+display:inline-block;
+width:13px;
+height:13px;
+border-radius:50%;
+margin-right:4px
 }
 
-.loading{
-    text-align:center;
-    padding:30px;
-    font-size:18px;
+.blue{background:#168cff}
+.cyan{background:#00d9ff}
+.purple{background:#8d58ff}
+.red{background:#ff3838}
+
+/* WEATHER DATA */
+
+.data-grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:10px
 }
 
-.error{
-    background:rgba(255,50,50,.2);
-    border:1px solid rgba(255,100,100,.4);
-    padding:15px;
-    border-radius:12px;
-    margin-bottom:20px;
+.data{
+background:#06192a;
+padding:16px;
+border-radius:12px
+}
+
+.data span{
+color:#9eb7c8;
+font-size:13px
+}
+
+.data b{
+display:block;
+font-size:20px;
+margin-top:5px
 }
 
 footer{
-    text-align:center;
-    padding:30px 15px;
-    color:#b8d1e3;
-    font-size:13px;
+text-align:center;
+padding:30px;
+color:#8eaabd
 }
 
-footer a{
-    color:#70c9ff;
-}
+footer a{color:#4dcaff}
 
-@media(max-width:800px){
+@media(max-width:750px){
 
-    .details{
-        grid-template-columns:repeat(2,1fr);
-    }
+.details{grid-template-columns:repeat(2,1fr)}
+.days{grid-template-columns:repeat(2,1fr)}
+.data-grid{grid-template-columns:repeat(2,1fr)}
+#map{height:390px}
+.radar-time{margin-left:0}
 
-    .forecast{
-        grid-template-columns:repeat(2,1fr);
-    }
-
-    .stats{
-        grid-template-columns:1fr;
-    }
-
-    .temperature{
-        font-size:52px;
-    }
-
-    header h1{
-        font-size:30px;
-    }
 }
 
 @media(max-width:500px){
 
-    .search-area{
-        flex-direction:column;
-    }
+.search{flex-direction:column}
+.temp{font-size:50px}
+.days{grid-template-columns:1fr}
+.data-grid{grid-template-columns:1fr}
+#map{height:340px}
 
-    .forecast{
-        grid-template-columns:1fr;
-    }
-
-    #map{
-        height:330px;
-    }
 }
-
 </style>
 </head>
 
 <body>
 
 <header>
-
-<h1>🌤️ YDK HAVA</h1>
-
-<p>Anlık hava durumu • 5 günlük tahmin • Saatlik hava • Yağış radarı</p>
-
+<h1>🌦️ YDK HAVA</h1>
+<p>Hava durumu • Gerçek radar • 5 günlük tahmin</p>
 </header>
 
 <div class="container">
 
-<div class="search-area">
-
-<input
-id="cityInput"
-type="text"
-placeholder="Şehir ara... Örn: Balıkesir">
-
+<div class="search">
+<input id="city" placeholder="Şehir ara... Örn: Balıkesir">
 <button onclick="searchCity()">🔎 Ara</button>
-
-<button class="location-btn" onclick="getLocation()">
-📍 Konumum
-</button>
-
+<button onclick="myLocation()">📍 Konumum</button>
 </div>
 
-<div id="message"></div>
+<div id="error"></div>
 
 <div class="card current">
 
 <div class="city" id="cityName">Balıkesir</div>
+<div class="date" id="date"></div>
 
-<div class="date" id="dateText">Hava durumu yükleniyor...</div>
+<div class="big-icon" id="icon">🌤️</div>
 
-<div class="weather-icon" id="currentIcon">🌤️</div>
+<div class="temp" id="temp">--°</div>
 
-<div class="temperature" id="temperature">--°</div>
-
-<div class="description" id="description">Yükleniyor...</div>
+<div class="desc" id="desc">Yükleniyor...</div>
 
 <div class="details">
 
 <div class="detail">
-🌡️ Hissedilen
-<strong id="feels">--°</strong>
+<span>🌡️ Hissedilen</span>
+<b id="feels">--°</b>
 </div>
 
 <div class="detail">
-💧 Nem
-<strong id="humidity">--%</strong>
+<span>💧 Nem</span>
+<b id="humidity">--%</b>
 </div>
 
 <div class="detail">
-💨 Rüzgar
-<strong id="wind">-- km/s</strong>
+<span>💨 Rüzgâr</span>
+<b id="wind">-- km/sa</b>
 </div>
 
 <div class="detail">
-☀️ UV
-<strong id="uv">--</strong>
+<span>☁️ Bulut</span>
+<b id="cloud">--%</b>
 </div>
 
 </div>
@@ -358,48 +312,116 @@ placeholder="Şehir ara... Örn: Balıkesir">
 
 <div class="card">
 
-<div class="section-title">
-📅 5 Günlük Tahmin
-</div>
+<div class="title">🕐 24 Saatlik Tahmin</div>
 
-<div class="forecast" id="forecast">
-
-<div class="loading">
-Tahmin yükleniyor...
-</div>
-
-</div>
+<div class="hourly" id="hourly"></div>
 
 </div>
 
 
 <div class="card">
 
-<div class="section-title">
-🕐 Saatlik Tahmin
-</div>
+<div class="title">📅 5 Günlük Tahmin</div>
 
-<div class="hourly" id="hourly">
-
-<div class="loading">
-Saatlik veriler yükleniyor...
-</div>
-
-</div>
+<div class="days" id="days"></div>
 
 </div>
 
 
 <div class="card">
 
-<div class="section-title">
-🌧️ Yağış Radarı
-</div>
+<div class="title">🌧️ GERÇEK YAĞIŞ RADARI</div>
+
+<div class="radar-box">
 
 <div id="map"></div>
 
-<div class="radar-info">
-Radar görüntüsü RainViewer verileri kullanılarak gösterilmektedir.
+<div class="radar-controls">
+
+<button onclick="previousRadar()">⏪ Önceki</button>
+
+<button onclick="playRadar()">▶️ Oynat</button>
+
+<button onclick="stopRadar()">⏸ Durdur</button>
+
+<button onclick="nextRadar()">⏩ Sonraki</button>
+
+<span class="radar-time" id="radarTime">
+Radar hazırlanıyor...
+</span>
+
+</div>
+
+</div>
+
+<div class="legend">
+
+<span><i class="dot blue"></i> Hafif yağış</span>
+<span><i class="dot cyan"></i> Orta yağış</span>
+<span><i class="dot purple"></i> Kuvvetli yağış</span>
+<span><i class="dot red"></i> Çok kuvvetli yağış</span>
+
+</div>
+
+<p style="margin-top:10px;color:#91afc0;font-size:13px">
+Radar animasyonu gerçek radar görüntülerinden oluşturulur.
+Gelecek saatler radar görüntüsü değil, tahmin verisidir.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<div class="title">🌦️ Meteorolojik Bilgiler</div>
+
+<div class="data-grid">
+
+<div class="data">
+<span>🌧️ Yağış</span>
+<b id="rain">-- mm</b>
+</div>
+
+<div class="data">
+<span>☔ Yağış ihtimali</span>
+<b id="rainChance">--%</b>
+</div>
+
+<div class="data">
+<span>💨 Rüzgâr hamlesi</span>
+<b id="gust">-- km/sa</b>
+</div>
+
+<div class="data">
+<span>🧭 Rüzgâr yönü</span>
+<b id="direction">--°</b>
+</div>
+
+<div class="data">
+<span>📊 Basınç</span>
+<b id="pressure">-- hPa</b>
+</div>
+
+<div class="data">
+<span>☀️ UV</span>
+<b id="uv">--</b>
+</div>
+
+<div class="data">
+<span>👁️ Görüş</span>
+<b id="visibility">-- km</b>
+</div>
+
+<div class="data">
+<span>🌅 Gün doğumu</span>
+<b id="sunrise">--</b>
+</div>
+
+<div class="data">
+<span>🌇 Gün batımı</span>
+<b id="sunset">--</b>
+</div>
+
 </div>
 
 </div>
@@ -407,48 +429,10 @@ Radar görüntüsü RainViewer verileri kullanılarak gösterilmektedir.
 
 <div class="card">
 
-<div class="section-title">
-📊 YDK HAVA İstatistikleri
-</div>
+<div class="title">⚡ Fırtına / Şimşek</div>
 
-<div class="stats">
-
-<div class="stat">
-
-<div>👁️</div>
-
-<div class="stat-number" id="views">
-0
-</div>
-
-<div>Sayfa görüntüleme</div>
-
-</div>
-
-<div class="stat">
-
-<div>📅</div>
-
-<div class="stat-number">
-5
-</div>
-
-<div>Günlük tahmin</div>
-
-</div>
-
-<div class="stat">
-
-<div>🌦️</div>
-
-<div class="stat-number">
-24
-</div>
-
-<div>Saatlik veri</div>
-
-</div>
-
+<div id="storm">
+Veriler yükleniyor...
 </div>
 
 </div>
@@ -462,16 +446,13 @@ YDK HAVA © 2026
 
 <br><br>
 
-Hava durumu verileri
+Hava verileri:
 <a href="https://open-meteo.com/" target="_blank">Open-Meteo</a>
-üzerinden sağlanmaktadır.
 
 <br>
 
 Radar:
-<a href="https://www.rainviewer.com/" target="_blank">
-RainViewer
-</a>
+<a href="https://www.rainviewer.com/" target="_blank">RainViewer</a>
 
 </footer>
 
@@ -480,487 +461,327 @@ RainViewer
 
 <script>
 
-let currentLat = 39.6484;
-let currentLon = 27.8826;
+let lat=39.6484;
+let lon=27.8826;
+let cityName="Balıkesir";
 
 let map;
-let radarLayer;
+let radarFrames=[];
+let radarIndex=0;
+let radarTimer=null;
+let radarLayer=null;
 
-const weatherCodes = {
+
+/* WEATHER CODES */
+
+const codes={
 
 0:["☀️","Açık"],
 1:["🌤️","Çoğunlukla açık"],
 2:["⛅","Parçalı bulutlu"],
 3:["☁️","Kapalı"],
-45:["🌫️","Sisli"],
-48:["🌫️","Kırağılı sis"],
+
+45:["🌫️","Sis"],
+48:["🌫️","Sis"],
+
 51:["🌦️","Hafif çiseleme"],
 53:["🌦️","Çiseleme"],
 55:["🌧️","Yoğun çiseleme"],
+
 61:["🌧️","Hafif yağmur"],
 63:["🌧️","Yağmur"],
 65:["🌧️","Kuvvetli yağmur"],
+
 71:["🌨️","Hafif kar"],
-73:["🌨️","Kar"],
+73:["❄️","Kar"],
 75:["❄️","Yoğun kar"],
+
 80:["🌦️","Sağanak"],
-81:["🌧️","Sağanak yağış"],
+81:["🌧️","Sağanak"],
 82:["⛈️","Kuvvetli sağanak"],
+
 95:["⛈️","Gök gürültülü fırtına"],
-96:["⛈️","Dolu ihtimali"],
+96:["⛈️","Fırtına / dolu"],
 99:["⛈️","Kuvvetli fırtına"]
 
 };
 
-
-function weatherInfo(code){
-
-return weatherCodes[code] || ["🌤️","Bilinmeyen"];
-
+function weather(code){
+return codes[code] || ["🌤️","Bilinmiyor"];
 }
 
 
-function formatDate(date){
+/* WEATHER */
 
-return new Intl.DateTimeFormat(
-"tr-TR",
-{
-weekday:"long",
-day:"numeric",
-month:"long",
-year:"numeric"
-}
-).format(date);
+async function loadWeather(){
 
-}
-
-
-function formatDay(dateString){
-
-let date = new Date(dateString + "T12:00:00");
-
-return new Intl.DateTimeFormat(
-"tr-TR",
-{
-weekday:"short",
-day:"numeric",
-month:"short"
-}
-).format(date);
-
-}
-
-
-async function loadWeather(lat,lon,city){
-
-currentLat = lat;
-currentLon = lon;
-
-document.getElementById("cityName").textContent = city;
-
-document.getElementById("dateText").textContent =
-formatDate(new Date());
-
-document.getElementById("description").textContent =
-"Veriler alınıyor...";
-
-
-const url =
-"https://api.open-meteo.com/v1/forecast?" +
-
-"latitude=" + lat +
-
-"&longitude=" + lon +
-
-"&current=" +
-"temperature_2m," +
-"relative_humidity_2m," +
-"apparent_temperature," +
-"is_day," +
-"precipitation," +
-"weather_code," +
-"wind_speed_10m," +
-"wind_direction_10m," +
-"surface_pressure," +
-"uv_index" +
-
-"&hourly=" +
-"temperature_2m," +
-"weather_code," +
-"precipitation_probability," +
-"precipitation," +
-"relative_humidity_2m," +
-"wind_speed_10m" +
-
-"&daily=" +
-"weather_code," +
-"temperature_2m_max," +
-"temperature_2m_min," +
-"precipitation_probability_max," +
-"precipitation_sum," +
-"uv_index_max," +
-"sunrise," +
-"sunset" +
-
-"&forecast_days=5" +
-
+const url=
+"https://api.open-meteo.com/v1/forecast?"+
+"latitude="+lat+
+"&longitude="+lon+
+"&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,surface_pressure,cloud_cover"+
+"&hourly=temperature_2m,weather_code,precipitation,precipitation_probability,wind_speed_10m,wind_direction_10m,cloud_cover,visibility"+
+"&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_gusts_10m,uv_index_max,sunrise,sunset"+
+"&forecast_days=5"+
 "&timezone=auto";
-
 
 try{
 
-const response = await fetch(url);
+const r=await fetch(url);
+const d=await r.json();
 
-if(!response.ok){
-throw new Error("Hava verisi alınamadı.");
-}
+const c=d.current;
+const info=weather(c.weather_code);
 
-const data = await response.json();
+document.getElementById("cityName").textContent=cityName;
 
-
-/* ANLIK */
-
-let current = data.current;
-
-let info = weatherInfo(current.weather_code);
-
-document.getElementById("currentIcon").textContent =
-info[0];
-
-document.getElementById("temperature").textContent =
-Math.round(current.temperature_2m) + "°";
-
-document.getElementById("description").textContent =
-info[1];
-
-document.getElementById("feels").textContent =
-Math.round(current.apparent_temperature) + "°";
-
-document.getElementById("humidity").textContent =
-current.relative_humidity_2m + "%";
-
-document.getElementById("wind").textContent =
-Math.round(current.wind_speed_10m) + " km/s";
-
-document.getElementById("uv").textContent =
-current.uv_index ?? "--";
-
-
-/* 5 GÜN */
-
-let forecastHTML = "";
-
-for(let i=0;i<5;i++){
-
-let fInfo =
-weatherInfo(data.daily.weather_code[i]);
-
-forecastHTML += `
-
-<div class="forecast-day">
-
-<div>
-${formatDay(data.daily.time[i])}
-</div>
-
-<div class="icon">
-${fInfo[0]}
-</div>
-
-<div>
-${fInfo[1]}
-</div>
-
-<div class="max">
-${Math.round(data.daily.temperature_2m_max[i])}°
-</div>
-
-<div class="min">
-${Math.round(data.daily.temperature_2m_min[i])}°
-</div>
-
-<div style="margin-top:8px;">
-🌧️ ${data.daily.precipitation_probability_max[i] ?? 0}%
-</div>
-
-</div>
-
-`;
-
-}
-
-document.getElementById("forecast").innerHTML =
-forecastHTML;
-
-
-/* SAATLİK */
-
-let hourlyHTML = "";
-
-let nowIndex = 0;
-
-let currentTime =
-new Date(current.time).getTime();
-
-for(let i=0;i<data.hourly.time.length;i++){
-
-let t =
-new Date(data.hourly.time[i]).getTime();
-
-if(t >= currentTime){
-
-let hInfo =
-weatherInfo(data.hourly.weather_code[i]);
-
-let time =
-new Date(data.hourly.time[i])
-.toLocaleTimeString("tr-TR",{
-hour:"2-digit",
-minute:"2-digit"
+document.getElementById("date").textContent=
+new Date().toLocaleDateString("tr-TR",{
+weekday:"long",
+day:"numeric",
+month:"long"
 });
 
-hourlyHTML += `
+document.getElementById("icon").textContent=info[0];
+
+document.getElementById("temp").textContent=
+Math.round(c.temperature_2m)+"°";
+
+document.getElementById("desc").textContent=info[1];
+
+document.getElementById("feels").textContent=
+Math.round(c.apparent_temperature)+"°";
+
+document.getElementById("humidity").textContent=
+c.relative_humidity_2m+"%";
+
+document.getElementById("wind").textContent=
+Math.round(c.wind_speed_10m)+" km/sa";
+
+document.getElementById("cloud").textContent=
+c.cloud_cover+"%";
+
+document.getElementById("rain").textContent=
+c.precipitation+" mm";
+
+document.getElementById("pressure").textContent=
+Math.round(c.surface_pressure)+" hPa";
+
+
+/* HOURLY */
+
+let h="";
+
+for(let i=0;i<24;i++){
+
+let time=new Date(d.hourly.time[i]);
+
+let wi=weather(d.hourly.weather_code[i]);
+
+h+=`
 
 <div class="hour">
 
-<div>${time}</div>
+<div>${time.toLocaleTimeString("tr-TR",{
+hour:"2-digit"
+})}</div>
 
-<div class="hicon">
-${hInfo[0]}
+<div class="hour-icon">${wi[0]}</div>
+
+<div><b>${Math.round(d.hourly.temperature_2m[i])}°</b></div>
+
+<div style="margin-top:5px">
+💧 ${d.hourly.precipitation_probability[i]}%
 </div>
 
-<div>
-${Math.round(data.hourly.temperature_2m[i])}°
-</div>
-
-<div style="margin-top:6px;">
-🌧️ ${data.hourly.precipitation_probability[i] ?? 0}%
-</div>
-
-<div style="margin-top:5px;">
-💨 ${Math.round(data.hourly.wind_speed_10m[i])}
+<div style="margin-top:5px">
+💨 ${Math.round(d.hourly.wind_speed_10m[i])}
 </div>
 
 </div>
 
 `;
 
-nowIndex++;
-
-if(nowIndex >= 24){
-break;
 }
 
-}
-
-}
-
-document.getElementById("hourly").innerHTML =
-hourlyHTML;
+document.getElementById("hourly").innerHTML=h;
 
 
-/* RADAR */
+/* DAYS */
 
-updateRadar();
+let days="";
 
-}
+for(let i=0;i<5;i++){
 
-catch(error){
+let wi=weather(d.daily.weather_code[i]);
 
-document.getElementById("message").innerHTML =
-
-`<div class="error">
-⚠️ Hava durumu verileri şu anda alınamadı.
-<br>
-Biraz sonra tekrar deneyin.
-</div>`;
-
-console.error(error);
-
-}
-
-}
-
-
-/* ŞEHİR ARAMA */
-
-async function searchCity(){
-
-let city =
-document.getElementById("cityInput").value.trim();
-
-if(!city){
-return;
-}
-
-try{
-
-let response =
-await fetch(
-"https://geocoding-api.open-meteo.com/v1/search?name=" +
-encodeURIComponent(city) +
-"&count=1&language=tr&format=json"
+let day=new Date(
+d.daily.time[i]+"T12:00:00"
 );
 
-let data =
-await response.json();
+days+=`
 
-if(!data.results || !data.results.length){
+<div class="day">
 
-document.getElementById("message").innerHTML =
-`<div class="error">❌ Şehir bulunamadı.</div>`;
+<div>
+${day.toLocaleDateString("tr-TR",{
+weekday:"long"
+})}
+</div>
 
-return;
+<div class="day-icon">${wi[0]}</div>
+
+<div>${wi[1]}</div>
+
+<div class="max">
+${Math.round(d.daily.temperature_2m_max[i])}°
+</div>
+
+<div class="min">
+${Math.round(d.daily.temperature_2m_min[i])}°
+</div>
+
+<div style="margin-top:8px">
+🌧️ ${d.daily.precipitation_probability_max[i]}%
+</div>
+
+</div>
+
+`;
 
 }
 
-let result =
-data.results[0];
+document.getElementById("days").innerHTML=days;
 
-document.getElementById("message").innerHTML = "";
 
-loadWeather(
-result.latitude,
-result.longitude,
-result.name
+/* EXTRA */
+
+document.getElementById("rainChance").textContent=
+d.daily.precipitation_probability_max[0]+"%";
+
+document.getElementById("gust").textContent=
+Math.round(d.daily.wind_gusts_10m[0])+" km/sa";
+
+document.getElementById("direction").textContent=
+Math.round(c.wind_direction_10m)+"°";
+
+document.getElementById("uv").textContent=
+d.daily.uv_index_max[0];
+
+document.getElementById("sunrise").textContent=
+new Date(d.daily.sunrise[0]).toLocaleTimeString(
+"tr-TR",{hour:"2-digit",minute:"2-digit"}
 );
 
-}
-
-catch(error){
-
-document.getElementById("message").innerHTML =
-`<div class="error">❌ Arama sırasında hata oluştu.</div>`;
-
-}
-
-}
-
-
-/* KONUM */
-
-function getLocation(){
-
-if(!navigator.geolocation){
-
-alert("Tarayıcınız konum özelliğini desteklemiyor.");
-
-return;
-
-}
-
-navigator.geolocation.getCurrentPosition(
-
-async position => {
-
-let lat =
-position.coords.latitude;
-
-let lon =
-position.coords.longitude;
-
-try{
-
-let response =
-await fetch(
-"https://geocoding-api.open-meteo.com/v1/reverse?latitude=" +
-lat +
-"&longitude=" +
-lon +
-"&language=tr&format=json"
+document.getElementById("sunset").textContent=
+new Date(d.daily.sunset[0]).toLocaleTimeString(
+"tr-TR",{hour:"2-digit",minute:"2-digit"}
 );
 
-let data =
-await response.json();
+let visibility=
+d.hourly.visibility[0];
 
-let city =
-data.address?.city ||
-data.address?.town ||
-data.address?.village ||
-"Konumunuz";
+document.getElementById("visibility").textContent=
+(visibility/1000).toFixed(1)+" km";
 
-loadWeather(lat,lon,city);
 
-}
+/* STORM */
 
-catch{
+if(c.weather_code>=95){
 
-loadWeather(lat,lon,"Konumunuz");
+document.getElementById("storm").innerHTML=
+"⚡ <b>Gök gürültülü fırtına koşulu</b><br><br>"+
+"Mevcut hava kodu fırtına kategorisinde.";
 
-}
+}else{
 
-},
-
-() => {
-
-alert(
-"Konum izni verilmedi. Şehir arama kutusunu kullanabilirsiniz."
-);
+document.getElementById("storm").innerHTML=
+"✅ Şu anda fırtına kodu bulunmuyor.<br><br>"+
+"Bu bölüm tahmin verilerine göre güncellenir.";
 
 }
 
-);
+}catch(e){
+
+document.getElementById("error").innerHTML=
+"<div class='card'>⚠️ Hava verileri alınamadı. Biraz sonra tekrar deneyin.</div>";
+
+}
 
 }
 
 
-/* RADAR HARİTASI */
+/* RADAR MAP */
 
-async function updateRadar(){
-
-try{
+async function initRadar(){
 
 if(!map){
 
-map = L.map("map").setView(
-[currentLat,currentLon],
-7
-);
+map=L.map("map").setView([lat,lon],7);
 
 L.tileLayer(
 "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
 {
-maxZoom:19,
 attribution:"© OpenStreetMap"
 }
 ).addTo(map);
 
 }
 
-let response =
-await fetch(
+try{
+
+const r=await fetch(
 "https://api.rainviewer.com/public/weather-maps.json"
 );
 
-let data =
-await response.json();
+const data=await r.json();
 
-if(!data.radar || !data.radar.past.length){
+radarFrames=data.radar?.past || [];
+
+if(!radarFrames.length){
+
+document.getElementById("radarTime").textContent=
+"Radar verisi bulunamadı";
 
 return;
 
 }
 
-let latest =
-data.radar.past[data.radar.past.length - 1];
+radarIndex=radarFrames.length-1;
 
-let tileUrl =
-data.host +
-latest.path +
-"/256/{z}/{x}/{y}/2/1_1.png";
+showRadar();
 
+}catch(e){
 
-if(radarLayer){
-
-map.removeLayer(radarLayer);
+document.getElementById("radarTime").textContent=
+"Radar bağlantısı kurulamadı";
 
 }
 
-radarLayer =
-L.tileLayer(
-tileUrl,
+}
+
+
+/* SHOW RADAR */
+
+function showRadar(){
+
+if(!radarFrames.length)return;
+
+const frame=radarFrames[radarIndex];
+
+if(radarLayer){
+map.removeLayer(radarLayer);
+}
+
+const url=
+"https://tilecache.rainviewer.com"+
+frame.path+
+"/256/{z}/{x}/{y}/2/1_1.png";
+
+radarLayer=L.tileLayer(
+url,
 {
-opacity:.65,
+opacity:.72,
 maxZoom:7,
 attribution:"Radar © RainViewer"
 }
@@ -968,50 +789,178 @@ attribution:"Radar © RainViewer"
 
 radarLayer.addTo(map);
 
-map.setView(
-[currentLat,currentLon],
-7
-);
+const date=new Date(frame.time*1000);
 
-}
-
-catch(error){
-
-console.log(
-"Radar yüklenemedi:",
-error
-);
-
-}
+document.getElementById("radarTime").textContent=
+"Radar: "+
+date.toLocaleTimeString("tr-TR",{
+hour:"2-digit",
+minute:"2-digit"
+});
 
 }
 
 
-/* GÖRÜNTÜLEME SAYACI */
+/* RADAR CONTROLS */
 
-let views =
-Number(
-localStorage.getItem("ydkHavaViews") || 0
+function nextRadar(){
+
+if(!radarFrames.length)return;
+
+radarIndex++;
+
+if(radarIndex>=radarFrames.length){
+radarIndex=0;
+}
+
+showRadar();
+
+}
+
+function previousRadar(){
+
+if(!radarFrames.length)return;
+
+radarIndex--;
+
+if(radarIndex<0){
+radarIndex=radarFrames.length-1;
+}
+
+showRadar();
+
+}
+
+function playRadar(){
+
+stopRadar();
+
+radarTimer=setInterval(
+nextRadar,
+700
 );
 
-views++;
+}
 
-localStorage.setItem(
-"ydkHavaViews",
-views
+function stopRadar(){
+
+if(radarTimer){
+clearInterval(radarTimer);
+radarTimer=null;
+}
+
+}
+
+
+/* CITY SEARCH */
+
+async function searchCity(){
+
+let q=document.getElementById("city").value.trim();
+
+if(!q)return;
+
+try{
+
+const r=await fetch(
+"https://geocoding-api.open-meteo.com/v1/search?name="+
+encodeURIComponent(q)+
+"&count=1&language=tr&format=json"
 );
 
-document.getElementById("views").textContent =
-views;
+const d=await r.json();
+
+if(!d.results?.length){
+
+alert("Şehir bulunamadı.");
+
+return;
+
+}
+
+const x=d.results[0];
+
+lat=x.latitude;
+lon=x.longitude;
+cityName=x.name;
+
+loadWeather();
+
+if(map){
+
+map.setView([lat,lon],7);
+
+}
+
+}catch{
+
+alert("Şehir aranırken hata oluştu.");
+
+}
+
+}
 
 
-/* BAŞLANGIÇ */
+/* LOCATION */
 
-loadWeather(
-39.6484,
-27.8826,
-"Balıkesir"
+function myLocation(){
+
+if(!navigator.geolocation){
+
+alert("Konum özelliği desteklenmiyor.");
+
+return;
+
+}
+
+navigator.geolocation.getCurrentPosition(
+
+async p=>{
+
+lat=p.coords.latitude;
+lon=p.coords.longitude;
+
+try{
+
+const r=await fetch(
+"https://geocoding-api.open-meteo.com/v1/search?name=Balikesir&count=1&language=tr&format=json"
 );
+
+cityName="Konumum";
+
+}catch{
+
+cityName="Konumum";
+
+}
+
+loadWeather();
+
+if(map){
+map.setView([lat,lon],7);
+}
+
+},
+
+()=>{
+alert("Konum izni verilmedi.");
+}
+
+);
+
+}
+
+
+/* START */
+
+loadWeather();
+initRadar();
+
+/* RADARI OTOMATİK YENİLE */
+
+setInterval(()=>{
+initRadar();
+},600000);
 
 </script>
 
