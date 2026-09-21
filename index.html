@@ -573,7 +573,7 @@ Math.round(c.surface_pressure)+" hPa";
 
 let h="";
 
-for(let i=0;i<4;i++){
+for(let i=0;i<24;i++){
 
 let time=new Date(d.hourly.time[i]);
 
@@ -612,7 +612,7 @@ document.getElementById("hourly").innerHTML=h;
 
 let days="";
 
-for(let i=0;i<5;i++){
+for(let i=0;i<4;i++){
 
 let wi=weather(d.daily.weather_code[i]);
 
